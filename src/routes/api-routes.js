@@ -1,4 +1,7 @@
+import express from 'express';
 import { getSchedulesForTripAndMonth } from '../controllers/schedules.js';
+
+const router = express.Router();
 
 /**
  * @swagger
@@ -25,3 +28,5 @@ import { getSchedulesForTripAndMonth } from '../controllers/schedules.js';
  *         description: Server error
  */
 router.get('/trips/:id/schedules', getSchedulesForTripAndMonth);
+
+export default router;

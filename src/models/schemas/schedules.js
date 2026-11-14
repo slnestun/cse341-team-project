@@ -2,8 +2,7 @@ import mongoose from 'mongoose';
 
 const scheduleSchema = new mongoose.Schema({
     tripId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Trip',
+        type: String, // Changed from ObjectId to String to match string slugs like 'alpine-panorama'
         required: true
     },
     departureTime: {
@@ -14,16 +13,14 @@ const scheduleSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    dayOfWeek: {
-        type: String,
+    months: {
+        type: [Number],
         required: true
     },
-    month: {
-        type: Number,
-        required: false
+    daysOfWeek: {
+        type: [String],
+        required: true
     }
 });
 
-const Schedule = mongoose.models.Schedule || mongoose.model('Schedule', scheduleSchema);
-
-export default Schedule;
+export default scheduleSchema;

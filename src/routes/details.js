@@ -7,7 +7,6 @@ export default async (req, res) => {
         const { tripId } = req.params;
         const db = getDb();
 
-        // Fetch trip directly from DB without needing the teammate's model file yet
         const details = await db.collection('trips').findOne({ id: tripId });
 
         if (!details) {
@@ -16,14 +15,13 @@ export default async (req, res) => {
             });
         }
 
-        // Schedules are now handled dynamically on the client-side via your new API!
-        res.render('trips/details', {
+        return res.render('trips/details', {
             title: 'Trip Details',
             details
         });
     } catch (error) {
         console.error('Error loading trip details:', error);
-        res.status(500).render('500', {
+        return res.status(500).render('500', {
             title: 'Server Error'
         });
     }

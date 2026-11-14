@@ -1,14 +1,21 @@
-import Schedule from './schemas/schedules.js';
+import { getDb } from '../db/connect.js';
 
-/**
- * Get schedules for a specific trip, with an optional month filter.
- * @param {string} tripId - The ID of the trip
- * @param {number} [month] - Optional month number
- */
 export async function getSchedulesByTripId(tripId, month) {
+    const db = getDb();
     const query = { tripId };
+
     if (month) {
-        query.month = Number(month);
+        const monthNum = parseInt(month, 10);
+        const monthStr = month.toString();
+
+        // Check multiple possible field names and handle both number & string types
+        query.$or = [
+            { months: monthNum },
+            { months: monthStr },
+            { month: monthNum },
+            { month: monthStr }
+        ];
     }
-    return Schedule.find(query).lean();
+
+    return await db.collection('schedules').find(query).toArray();
 }
