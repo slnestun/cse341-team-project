@@ -20,6 +20,10 @@ const openApiSpec = {
         {
             name: 'Trains',
             description: 'Train information'
+        },
+        {
+            name: 'Ticket Classes',
+            description: 'Ticket class availability and pricing information'
         }
     ],
     paths: {
@@ -151,6 +155,61 @@ const openApiSpec = {
                     }
                 }
             }
+        },
+        '/api/ticket-classes': {
+            get: {
+                tags: ['Ticket Classes'],
+                summary: 'Get ticket classes',
+                description:
+                    'Returns all ticket classes or only the classes available for a requested weekday.',
+                parameters: [
+                    {
+                        name: 'day',
+                        in: 'query',
+                        required: false,
+                        description:
+                            'Optional weekday used to filter ticket-class availability.',
+                        schema: {
+                            type: 'string',
+                            enum: [
+                                'monday',
+                                'tuesday',
+                                'wednesday',
+                                'thursday',
+                                'friday',
+                                'saturday',
+                                'sunday'
+                            ]
+                        }
+                    }
+                ],
+                responses: {
+                    200: {
+                        description: 'Ticket classes retrieved successfully.',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'object',
+                                    properties: {
+                                        ticketClasses: {
+                                            type: 'array',
+                                            items: {
+                                                $ref: '#/components/schemas/TicketClass'
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: {
+                        description: 'The day query parameter is invalid.'
+                    },
+                    500: {
+                        description: 'Unable to retrieve ticket classes.'
+                    }
+                }
+            }
         }
     },
     components: {
@@ -191,6 +250,34 @@ const openApiSpec = {
                     description: { type: 'string' },
                     bestFor: { type: 'string' },
                     imageUrl: { type: 'string' }
+                }
+            },
+            TicketClass: {
+                type: 'object',
+                properties: {
+                    class: { type: 'string', example: 'standard' },
+                    name: { type: 'string', example: 'Standard Class' },
+                    pricePerKm: { type: 'number', example: 80 },
+                    amenities: {
+                        type: 'array',
+                        items: { type: 'string' }
+                    },
+                    description: { type: 'string' },
+                    availableDays: {
+                        type: 'array',
+                        items: {
+                            type: 'string',
+                            enum: [
+                                'monday',
+                                'tuesday',
+                                'wednesday',
+                                'thursday',
+                                'friday',
+                                'saturday',
+                                'sunday'
+                            ]
+                        }
+                    }
                 }
             }
         }
