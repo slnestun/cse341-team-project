@@ -82,8 +82,7 @@
                 <div class="months-grid" id="month-selector">
                     <button class="month-badge active" data-month="">All Months</button>
                     <% if (details.operatingMonths && details.operatingMonths.length> 0) { %>
-                        <% details.operatingMonths.forEach(function(month, index) { %>
-                            <!-- Assuming month numbers 1-12 or month names; adjust value to match your backend schema (e.g. index + 1) -->
+                        <% details.operatingMonths.forEach(function(month) { %>
                             <button class="month-badge" data-month="<%= month %>">
                                 <%= month %>
                             </button>
@@ -150,7 +149,7 @@
                 <div class="schedule-days">
                     ${schedule.daysOfWeek ? schedule.daysOfWeek.map(day => `<span class="day-badge">${day.substring(0, 3)}</span>`).join('') : ''}
                 </div>
-                <a href="/trips/booking/${schedule._id}" class="book-btn">Book Now</a>
+                <a href="/trips/booking/${schedule.id}" class="book-btn">Book Now</a>
             </div>
         `).join('');
             }

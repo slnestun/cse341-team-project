@@ -1,32 +1,25 @@
-import express from 'express';
 import { getSchedulesForTripAndMonth } from '../controllers/schedules.js';
+import { Router } from 'express';
+import {
+    getAllTrips,
+    getTripById
+} from '../controllers/trips.js';
+import {
+    getAllTrains,
+    getTrainById
+} from '../controllers/trains.js';
 
-const router = express.Router();
+const router = Router();
 
-/**
- * @swagger
- * /api/trips/{id}/schedules:
- *   get:
- *     summary: Retrieve schedules for a specific trip, optionally filtered by month
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The trip ID
- *       - in: query
- *         name: month
- *         required: false
- *         schema:
- *           type: integer
- *         description: Optional month number to filter schedules
- *     responses:
- *       200:
- *         description: A list of schedules for the trip
- *       500:
- *         description: Server error
- */
-router.get('/trips/:id/schedules', getSchedulesForTripAndMonth);
+// Trips API
+router.get('/api/trips', getAllTrips);
+router.get('/api/trips/:id', getTripById);
+
+// Trains API
+router.get('/api/trains', getAllTrains);
+router.get('/api/trains/:id', getTrainById);
+
+// Schedules API
+router.get('/api/trips/:id/schedules', getSchedulesForTripAndMonth);
 
 export default router;
