@@ -1,10 +1,11 @@
 import { MongoClient } from 'mongodb';
+import mongoose from 'mongoose';
 
 let database;
 let client;
 
 const connectToDb = async (options = {}) => {
-  if (database) {
+  if (database && mongoose.connection.readyState === 1) {
     return database;
   }
 
@@ -15,9 +16,15 @@ const connectToDb = async (options = {}) => {
     throw new Error('MONGODB_URI is required.');
   }
 
-  client = new MongoClient(connectionString);
-  await client.connect();
-  database = client.db(databaseName);
+  if (!database) {
+    client = new MongoClient(connectionString);
+    await client.connect();
+    database = client.db(databaseName);
+  }
+  
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(connectionString, { dbName: databaseName });
+  }
   return database;
 };
 
@@ -33,6 +40,9 @@ const closeDb = async () => {
     await client.close();
     client = undefined;
     database = undefined;
+  }
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect();
   }
 };
 
