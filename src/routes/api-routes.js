@@ -8,6 +8,10 @@ import {
     getAllTrains,
     getTrainById
 } from '../controllers/trains.js';
+import {
+    getAllTicketClasses,
+    getTicketClassesForDay
+} from '../controllers/ticket-classes.js';
 
 const router = Router();
 
@@ -19,4 +23,12 @@ router.get('/api/trips/:id', getTripById);
 router.get('/api/trains', getAllTrains);
 router.get('/api/trains/:id', getTrainById);
 
+// Ticket Classes API
+router.get('/api/ticket-classes', (req, res) => {
+    if (Object.hasOwn(req.query, 'day')) {
+        return getTicketClassesForDay(req, res);
+    }
+
+    return getAllTicketClasses(req, res);
+});
 export default router;
