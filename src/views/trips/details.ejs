@@ -84,7 +84,7 @@
                     <% if (details.operatingMonths && details.operatingMonths.length> 0) { %>
                         <% details.operatingMonths.forEach(function(month, index) { %>
                             <!-- Assuming month numbers 1-12 or month names; adjust value to match your backend schema (e.g. index + 1) -->
-                            <button class="month-badge" data-month="<%= index + 1 %>">
+                            <button class="month-badge" data-month="<%= month %>">
                                 <%= month %>
                             </button>
                             <% }); %>
