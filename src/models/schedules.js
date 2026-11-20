@@ -3,10 +3,10 @@ import { getDb } from '../db/connect.js';
 export async function getSchedulesByTripId(tripId, month) {
     const db = getDb();
 
-    if (month) {
-        const monthNum = parseInt(month, 10);
+    if (month !== undefined) {
+        const monthNum = Number(String(month).trim());
 
-        if (Number.isNaN(monthNum)) {
+        if (!Number.isInteger(monthNum) || monthNum < 1 || monthNum > 12) {
             return [];
         }
 
