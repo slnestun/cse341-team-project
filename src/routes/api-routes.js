@@ -1,35 +1,25 @@
 import { Router } from "express";
 import { getAllBookings } from "../controllers/bookings.js";
+import { getSchedulesForTripAndMonth } from "../controllers/schedules.js";
+import {
+  getAllTrips,
+  getTripById,
+} from "../controllers/trips.js";
+import {
+  getAllTrains,
+  getTrainById,
+} from "../controllers/trains.js";
 
 const router = Router();
 
-/**
- * @swagger
- * /api/bookings:
- *   get:
- *     summary: Retrieve all bookings
- *     responses:
- *       200:
- *         description: Bookings retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 bookings:
- *                   type: array
- *                   items:
- *                     type: object
- *             example:
- *               bookings: []
- *       500:
- *         description: Unable to load bookings
- *         content:
- *           application/json:
- *             example:
- *               error: Unable to load bookings.
- */
+router.get("/api/trips", getAllTrips);
+router.get("/api/trips/:id", getTripById);
 
-router.get("/bookings", getAllBookings);
+router.get("/api/trains", getAllTrains);
+router.get("/api/trains/:id", getTrainById);
+
+router.get("/api/trips/:id/schedules", getSchedulesForTripAndMonth);
+
+router.get("/api/bookings", getAllBookings);
 
 export default router;

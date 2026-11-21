@@ -48,11 +48,11 @@
 			list.replaceChildren(fragment);
 			status.textContent =
 				bookings.length === 0
-					? "No bookings found."
+					? "No bookings yet."
 					: `${bookings.length} bookings loaded.`;
 		} catch (error) {
 			console.error(error);
-			status.textContent = "Unable to load bookings. Please try again.";
+			status.textContent = "Couldn’t load bookings. Please try again.";
 		}
 	};
 
