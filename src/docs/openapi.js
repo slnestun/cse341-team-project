@@ -24,6 +24,10 @@ const openApiSpec = {
         {
             name: 'Trains',
             description: 'Train information'
+        },
+        {
+            name: 'Stations',
+            description: 'Train station information'
         }
     ],
     paths: {
@@ -207,6 +211,67 @@ const openApiSpec = {
                     }
                 }
             }
+        },
+        '/api/stations': {
+            get: {
+                tags: ['Stations'],
+                summary: 'Get all stations',
+                description: 'Returns a list of all train stations.',
+                responses: {
+                    200: {
+                        description: 'Stations retrieved successfully.',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'array',
+                                    items: {
+                                        $ref: '#/components/schemas/Station'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    500: {
+                        description: 'Failed to fetch stations.'
+                    }
+                }
+            }
+        },
+        '/api/stations/{id}': {
+            get: {
+                tags: ['Stations'],
+                summary: 'Get a station by ID',
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        description: 'The unique station ID (e.g., nagoya, osaka).',
+                        schema: {
+                            type: 'string',
+                            example: 'nagoya'
+                        }
+                    }
+                ],
+                responses: {
+                    200: {
+                        description: 'Station retrieved successfully.',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    $ref: '#/components/schemas/Station'
+                                }
+                            }
+                        }
+                    },
+                    404: {
+                        description: 'Station not found.'
+                    },
+                    500: {
+                        description: 'Failed to fetch station.'
+                    }
+                }
+            }
         }
     },
     components: {
@@ -264,6 +329,21 @@ const openApiSpec = {
                     description: { type: 'string' },
                     bestFor: { type: 'string' },
                     imageUrl: { type: 'string' }
+                }
+            },
+            Station: {
+                type: 'object',
+                properties: {
+                    id: { type: 'string', example: 'nagoya' },
+                    name: { type: 'string', example: 'Nagoya Station' },
+                    prefecture: { type: 'string', example: 'Aichi' },
+                    region: { type: 'string', example: 'Chubu' },
+                    facilities: {
+                        type: 'array',
+                        items: { type: 'string' },
+                        example: ['wifi', 'luggage_storage', 'restaurants']
+                    },
+                    description: { type: 'string' }
                 }
             }
         }

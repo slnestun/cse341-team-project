@@ -128,7 +128,6 @@ article.route-detail {
         }
 
         .route-stations {
-
             .stations {
                 display: flex;
                 flex-direction: column;
@@ -150,11 +149,71 @@ article.route-detail {
                         text-transform: uppercase;
                         letter-spacing: 0.05em;
                     }
+                    .station-header {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        gap: var(--space-md);
 
-                    .station-name {
-                        font-size: var(--font-size-lg);
-                        font-weight: 500;
-                        color: var(--clr-primary);
+                        .station-name {
+                            font-size: var(--font-size-lg);
+                            font-weight: 500;
+                            color: var(--clr-primary);
+                        }
+                        .station-info-btn {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: var(--space-xs);
+                            padding: var(--space-xs) var(--space-md);
+                            font-size: var(--font-size-xs);
+                            font-weight: 600;
+                            color: var(--clr-primary);
+                            background-color: transparent;
+                            border: 1px solid var(--clr-border-light);
+                            border-radius: var(--radius-md);
+                            cursor: pointer;
+                            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+
+                            &::after {
+                                content: "▾";
+                                transition: transform 0.2s ease;
+                            }
+
+                            &:hover {
+                                border-color: var(--clr-primary);
+                            }
+                            &[aria-expanded="true"] {
+                                background-color: var(--clr-primary);
+                                color: var(--clr-surface);
+                                border-color: var(--clr-primary);
+                                &::after {
+                                    transform: rotate(180deg);
+                                }
+                            }
+                        }
+                    }
+                    /* panel with details from the API */
+                    .station-details {
+                        margin-top: var(--space-xs);
+                        padding: var(--space-md);
+                        border: 1px solid var(--clr-border-light);
+                        border-left: 3px solid var(--clr-primary);
+                        border-radius: var(--radius-md);
+                        font-size: var(--font-size-xs);
+                        color: var(--clr-text-muted);
+                        line-height: 1.5;
+                        p {
+                            margin: var(--space-xs) 0;
+
+                            &:first-child {
+                                margin-top: 0;
+                                color: var(--clr-primary);
+                            }
+
+                            &:last-child {
+                                margin-bottom: 0;
+                            }
+                        }
                     }
                 }
             }
@@ -314,14 +373,14 @@ article.route-detail {
                 grid-area: stations;
 
                 .stations {
-                    display: inline-flex;
-                    flex-direction: row;
-                    align-items: center;
-                    justify-content: space-between;
-                    column-gap: var(--space-2xl);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: var(--space-md);
+                    
 
                     .station {
-                        flex: 0 0 auto;
+                        width: 100%;
                     }
                 }
             }
