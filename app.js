@@ -1,9 +1,13 @@
+
 import express from 'express';
 import Path from 'path';
 import { fileURLToPath } from 'url';
 import pkg from './package.json' with { type: 'json' };
 import globalMiddleware from './src/middleware/global.js';
-import routes from './src/routes/router.js';
+import apiRoutes from './src/routes/api-routes.js';
+import ejsRoutes from './src/routes/ejs-routes.js';
+import swaggerUi from 'swagger-ui-express';
+import openApiSpec from './src/docs/openapi.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = Path.dirname(__filename);
@@ -26,7 +30,21 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(globalMiddleware);
-app.use('/', routes);
+
+// Swagger documentation
+app.get('/api-docs.json', (req, res) => {
+    return res.json(openApiSpec);
+});
+
+app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(openApiSpec)
+);
+
+// Mount API and EJS routes separately.
+app.use('/', apiRoutes);
+app.use('/', ejsRoutes);
 
 // Catch requests that did not match a route.
 app.use((req, res, next) => {

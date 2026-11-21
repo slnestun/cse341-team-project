@@ -1,43 +1,33 @@
-import { Router } from "express";
-import { getAllStations, getStationById } from "../controllers/stations.js";
+import { Router } from 'express';
+import {
+    getAllTrips,
+    getTripById
+} from '../controllers/trips.js';
+import {
+    getAllTrains,
+    getTrainById
+} from '../controllers/trains.js';
+import { getSchedulesForTripAndMonth } from '../controllers/schedules.js';
+import {
+    getAllStations,
+    getStationById
+} from '../controllers/stations.js';
 
-const apiRouter = Router();
+const router = Router();
 
-/**
- * @swagger
- * /api/stations:
- *   get:
- *     summary: Retrieve all stations
- *     tags: [Stations]
- *     responses:
- *       200:
- *         description: A list of all stations
- *       500:
- *         description: Failed to fetch stations
- */
-apiRouter.get("/stations", getAllStations);
+// Trips API
+router.get('/api/trips', getAllTrips);
+router.get('/api/trips/:id', getTripById);
 
-/**
- * @swagger
- * /api/stations/{id}:
- *   get:
- *     summary: Retrieve a single station by ID
- *     tags: [Stations]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The station ID (e.g., nagoya, osaka)
- *     responses:
- *       200:
- *         description: Station details
- *       404:
- *         description: Station not found
- *       500:
- *         description: Failed to fetch station
- */
-apiRouter.get("/stations/:id", getStationById);
+// Trains API
+router.get('/api/trains', getAllTrains);
+router.get('/api/trains/:id', getTrainById);
 
-export default apiRouter;
+// Schedules API
+router.get('/api/trips/:id/schedules', getSchedulesForTripAndMonth);
+
+// Stations API
+router.get('/api/stations', getAllStations);
+router.get('/api/stations/:id', getStationById);
+
+export default router;

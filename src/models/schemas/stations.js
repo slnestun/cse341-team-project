@@ -6,43 +6,38 @@ const stationSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
-            trim: true,
+            trim: true
         },
         name: {
             type: String,
             required: true,
-            trim: true,
-        },
-        name: {
-            type: String,
-            required: true,
-            trim: true,
+            trim: true
         },
         prefecture: {
             type: String,
             required: true,
-            trim: true,
+            trim: true
         },
         region: {
             type: String,
             required: true,
-            trim: true,
+            trim: true
         },
         facilities: {
             type: [String],
-            default: [],
+            default: []
         },
         description: {
             type: String,
             required: false,
-        trim: true,
-        },
+            trim: true
+        }
     },
     {
-    timestamps: true,
+        timestamps: true
     }
 );
 
-const Station = mongoose.model("Station", stationSchema);
+const Station = mongoose.model('Station', stationSchema);
 
 export default Station;
