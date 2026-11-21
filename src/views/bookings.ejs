@@ -1,0 +1,62 @@
+<%- include('partials/header') %>
+
+<section>
+	<h1>Bookings Admin</h1>
+	<p id="bookings-status" role="status">Loading bookings…</p>
+	<div id="bookings-list"></div>
+</section>
+
+<template id="booking-template">
+	<article>
+		<h2 class="booking-id"></h2>
+		<p class="booking-trip"></p>
+		<p class="booking-day"></p>
+		<p class="booking-passengers"></p>
+	</article>
+</template>
+
+<script>
+	const loadBookings = async () => {
+		const status = document.querySelector("#bookings-status");
+		const list = document.querySelector("#bookings-list");
+		const template = document.querySelector("#booking-template");
+
+		try {
+			const response = await fetch("/api/bookings");
+
+			if (!response.ok) {
+				throw new Error("Unable to load bookings.");
+			}
+
+			const { bookings } = await response.json();
+			const fragment = document.createDocumentFragment();
+
+			bookings.forEach((booking) => {
+				const card = template.content.cloneNode(true);
+
+				card.querySelector(".booking-id").textContent = booking.id;
+				card.querySelector(".booking-trip").textContent =
+					`Trip: ${booking.tripId}`;
+				card.querySelector(".booking-day").textContent =
+					`Day: ${booking.selectedDay}`;
+				card.querySelector(".booking-passengers").textContent =
+					`Passengers: ${booking.passengers.length}`;
+
+				fragment.append(card);
+			});
+
+			list.replaceChildren(fragment);
+			status.textContent =
+				bookings.length === 0
+					? "No bookings found."
+					: `${bookings.length} bookings loaded.`;
+		} catch (error) {
+			console.error(error);
+			status.textContent = "Unable to load bookings. Please try again.";
+		}
+	};
+
+	loadBookings();
+</script>
+
+<%- include('partials/footer') %>
