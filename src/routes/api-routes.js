@@ -1,4 +1,4 @@
-
+import { getSchedulesForTripAndMonth } from '../controllers/schedules.js';
 import { Router } from 'express';
 import {
     getAllTrips,
@@ -18,5 +18,8 @@ router.get('/api/trips/:id', getTripById);
 // Trains API
 router.get('/api/trains', getAllTrains);
 router.get('/api/trains/:id', getTrainById);
+
+// Schedules API
+router.get('/api/trips/:id/schedules', getSchedulesForTripAndMonth);
 
 export default router;

@@ -18,6 +18,10 @@ const openApiSpec = {
             description: 'Scenic train trip information'
         },
         {
+            name: 'Schedules',
+            description: 'Trip schedule information'
+        },
+        {
             name: 'Trains',
             description: 'Train information'
         }
@@ -84,6 +88,58 @@ const openApiSpec = {
                     },
                     500: {
                         description: 'Unable to retrieve trip.'
+                    }
+                }
+            }
+        },
+        '/api/trips/{id}/schedules': {
+            get: {
+                tags: ['Schedules'],
+                summary: 'Get schedules for a trip',
+                description: 'Returns schedules for a specific trip, optionally filtered by operating month (1-12).',
+                parameters: [
+                    {
+                        name: 'id',
+                        in: 'path',
+                        required: true,
+                        description: 'The unique trip ID or slug.',
+                        schema: {
+                            type: 'string',
+                            example: 'alpine-panorama'
+                        }
+                    },
+                    {
+                        name: 'month',
+                        in: 'query',
+                        required: false,
+                        description: 'Optional month filter as an integer from 1 to 12.',
+                        schema: {
+                            type: 'integer',
+                            minimum: 1,
+                            maximum: 12,
+                            example: 4
+                        }
+                    }
+                ],
+                responses: {
+                    200: {
+                        description: 'Schedules retrieved successfully.',
+                        content: {
+                            'application/json': {
+                                schema: {
+                                    type: 'array',
+                                    items: {
+                                        $ref: '#/components/schemas/Schedule'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    400: {
+                        description: 'Invalid month query parameter (must be an integer between 1 and 12).'
+                    },
+                    500: {
+                        description: 'Failed to fetch schedules for trip.'
                     }
                 }
             }
@@ -176,6 +232,23 @@ const openApiSpec = {
                         items: { type: 'integer' }
                     },
                     imageUrl: { type: 'string' }
+                }
+            },
+            Schedule: {
+                type: 'object',
+                properties: {
+                    id: { type: 'number', example: 1 },
+                    tripId: { type: 'string', example: 'alpine-panorama' },
+                    trainId: { type: 'string', example: 'shinano-express' },
+                    departureTime: { type: 'string', example: '09:00' },
+                    arrivalTime: { type: 'string', example: '12:30' },
+                    daysOfWeek: {
+                        type: 'array',
+                        items: { type: 'string' },
+                        example: ['Monday', 'Wednesday', 'Friday']
+                    },
+                    price: { type: 'number', example: 120 },
+                    availableSeats: { type: 'integer', example: 40 }
                 }
             },
             Train: {
