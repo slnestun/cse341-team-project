@@ -6,6 +6,7 @@ import {
 	createBooking,
 	getBookingById,
 } from "../models/bookings.js";
+import { getAllTicketClasses } from "../models/ticket-classes.js";
 
 export async function getAllBookings(req, res) {
 	try {
@@ -34,13 +35,14 @@ const bookingPage = async (req, res) => {
 		throw error;
 	}
 	const trip = await db.collection("trips").findOne({ id: schedule.tripId });
-	const ticketClasses = await db.collection("ticketClasses").find({}).toArray();
+	const ticketClasses = await getAllTicketClasses();
 	const ticketOptions = ticketClasses.map((ticketClass) => ({
 		class: ticketClass.class,
 		name: ticketClass.name,
 		price: trip.distance * ticketClass.pricePerKm,
 		amenities: ticketClass.amenities,
 		description: ticketClass.description,
+		availableDays: ticketClass.availableDays,
 	}));
 
 	res.render("trips/book", {

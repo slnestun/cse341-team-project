@@ -9,6 +9,10 @@ import {
   getAllTrains,
   getTrainById,
 } from "../controllers/trains.js";
+import {
+  getAllTicketClasses,
+  getTicketClassesForDay,
+} from "../controllers/ticket-classes.js";
 
 const router = Router();
 
@@ -21,5 +25,13 @@ router.get("/api/trains/:id", getTrainById);
 router.get("/api/trips/:id/schedules", getSchedulesForTripAndMonth);
 
 router.get("/api/bookings", getAllBookings);
+
+router.get("/api/ticket-classes", (req, res) => {
+  if (Object.hasOwn(req.query, "day")) {
+    return getTicketClassesForDay(req, res);
+  }
+
+  return getAllTicketClasses(req, res);
+});
 
 export default router;
