@@ -15,12 +15,29 @@ import {
     processBookingRequest
 } from './book.js';
 import confirmationPage from './confirm.js';
+import {
+    adminDashboardPage,
+    login,
+    loginPage,
+    logout,
+    register,
+    registerPage
+} from '../controllers/auth.js';
+import { requirePageRole } from '../middleware/auth.js';
 
 const router = Router();
 
 // Home and information pages
 router.get('/', homePage);
 router.get('/about', aboutPage);
+
+// Authentication pages
+router.get('/register', registerPage);
+router.post('/register', register);
+router.get('/login', loginPage);
+router.post('/login', login);
+router.post('/logout', logout);
+router.get('/admin', requirePageRole('admin'), adminDashboardPage);
 
 // Trains page
 router.get('/trains', trainsPage);

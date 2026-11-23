@@ -8,11 +8,18 @@ import apiRoutes from './src/routes/api-routes.js';
 import ejsRoutes from './src/routes/ejs-routes.js';
 import swaggerUi from 'swagger-ui-express';
 import openApiSpec from './src/docs/openapi.js';
+import session from 'express-session';
+import { loadSessionUser } from './src/middleware/auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = Path.dirname(__filename);
 
 const app = express();
+const sessionSecret = process.env.SESSION_SECRET;
+
+if (!sessionSecret) {
+    throw new Error('SESSION_SECRET is required.');
+}
 
 // Add version info to res.locals for access in templates.
 app.use((req, res, next) => {
@@ -29,6 +36,17 @@ app.set('views', Path.join(__dirname, 'src/views'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+app.use(session({
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    rolling: true,
+    cookie: {
+        maxAge: 60 * 60 * 1000
+    }
+}));
+
+app.use(loadSessionUser);
 app.use(globalMiddleware);
 
 // Swagger documentation
