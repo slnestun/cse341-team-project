@@ -59,4 +59,15 @@ describe('GET /api/ticket-classes', () => {
             error: 'Invalid day. Use a weekday from monday through sunday.'
         });
     });
+
+    test('rejects duplicate day query parameters', async () => {
+        const response = await request(app)
+            .get('/api/ticket-classes')
+            .query({ day: ['monday', 'tuesday'] });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            error: 'Invalid day. Use a weekday from monday through sunday.'
+        });
+    });
 });
