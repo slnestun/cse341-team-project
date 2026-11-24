@@ -57,6 +57,16 @@ article.booking-page {
                         box-shadow: var(--shadow-md);
                     }
 
+                    &.is-unavailable {
+                        cursor: not-allowed;
+                        opacity: 0.45;
+
+                        &:hover {
+                            border-color: var(--clr-border);
+                            box-shadow: none;
+                        }
+                    }
+
                     input[type="radio"] {
                         position: absolute;
                         opacity: 0;
@@ -149,6 +159,15 @@ article.booking-page {
                             }
                         }
                     }
+                }
+            }
+
+            .ticket-availability-message {
+                color: var(--clr-text-secondary);
+                margin: 0 0 var(--space-md);
+
+                &.is-error {
+                    color: var(--clr-error, #b42318);
                 }
             }
         }
