@@ -1,22 +1,27 @@
+
 import { Router } from "express";
 import { homePage, aboutPage, testErrorPage } from "./index.js";
 import { trainsPage } from "./trains.js";
 import { listTripsPage, tripDetailsPage } from "../controllers/trips.js";
 import {
-	bookingsAdminPage,
-	bookingPage,
-	processBookingRequest,
-	confirmationPage,
+    bookingsAdminPage,
+    bookingPage,
+    processBookingRequest,
+    confirmationPage,
 } from "../controllers/bookings.js";
 import {
-	adminDashboardPage,
-	login,
-	loginPage,
-	logout,
-	register,
-	registerPage,
+    adminDashboardPage,
+    login,
+    loginPage,
+    logout,
+    register,
+    registerPage,
 } from "../controllers/auth.js";
-import { requirePageRole } from "../middleware/auth.js";
+import { usersAdminPage } from "../controllers/users.js";
+import {
+    requirePageLogin,
+    requirePageRole
+} from "../middleware/auth.js";
 
 const router = Router();
 
@@ -32,7 +37,11 @@ router.post("/register", register);
 router.get("/login", loginPage);
 router.post("/login", login);
 router.post("/logout", logout);
+
 router.get("/admin", requirePageRole("admin"), adminDashboardPage);
+
+// Protected User Admin page
+router.get("/users-admin", requirePageLogin, usersAdminPage);
 
 router.get("/bookings-admin", bookingsAdminPage);
 router.get("/trips/booking/:scheduleId", bookingPage);
