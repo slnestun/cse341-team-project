@@ -96,7 +96,8 @@ const login = async (req, res, next) => {
             role: user.role.name
         };
 
-        return res.redirect('/');
+        const dashboardPath = user.role.name === 'admin' ? '/admin' : '/dashboard';
+        return res.redirect(dashboardPath);
     } catch (error) {
         return next(error);
     }
@@ -117,11 +118,19 @@ const adminDashboardPage = (req, res) => {
     return res.render('auth/admin', { title: 'Admin Dashboard' });
 };
 
+const userDashboardPage = (req, res) => {
+    return res.render('auth/dashboard', {
+        title: 'User Dashboard',
+        user: req.user
+    });
+};
+
 export {
     registerPage,
     register,
     loginPage,
     login,
     logout,
-    adminDashboardPage
+    adminDashboardPage,
+    userDashboardPage
 };

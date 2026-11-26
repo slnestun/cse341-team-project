@@ -93,13 +93,24 @@ header {
                         border-bottom: none;
                     }
 
-                    a {
+                    .inline-logout-form {
+                        margin: 0;
+                    }
+
+                    a,
+                    .inline-logout-form button {
                         display: block;
+                        width: 100%;
                         padding: var(--space-md) var(--space-lg);
+                        background: transparent;
+                        border: none;
                         color: var(--clr-text-primary);
+                        text-align: left;
                         text-decoration: none;
+                        font-family: inherit;
                         font-size: var(--font-size-md);
                         font-weight: 500;
+                        cursor: pointer;
                         transition: all 0.2s ease;
 
                         &:hover {
@@ -112,7 +123,7 @@ header {
 
             /* When checkbox is checked */
             #mobile-menu-toggle:checked {
-                & + label {
+                &+label {
                     background-color: var(--clr-primary-pale);
 
                     span {
@@ -131,7 +142,7 @@ header {
                     }
                 }
 
-                & ~ ul {
+                &~ul {
                     opacity: 1;
                     visibility: visible;
                     transform: translateY(0);
@@ -164,8 +175,14 @@ header {
                         border-bottom: none;
                         margin: 0;
 
-                        a {
+                        .inline-logout-form {
                             display: inline-block;
+                        }
+
+                        a,
+                        .inline-logout-form button {
+                            display: inline-block;
+                            width: auto;
                             padding: calc(var(--space-sm) / 2) var(--space-md);
                             border: 1px solid var(--clr-border);
                             border-radius: var(--radius-md);
