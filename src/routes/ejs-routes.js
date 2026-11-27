@@ -8,6 +8,15 @@ import {
 	processBookingRequest,
 	confirmationPage,
 } from "../controllers/bookings.js";
+import {
+	adminDashboardPage,
+	login,
+	loginPage,
+	logout,
+	register,
+	registerPage,
+} from "../controllers/auth.js";
+import { requirePageRole } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -17,6 +26,13 @@ router.get("/trains", trainsPage);
 
 router.get("/trips", listTripsPage);
 router.get("/trips/:tripId", tripDetailsPage);
+
+router.get("/register", registerPage);
+router.post("/register", register);
+router.get("/login", loginPage);
+router.post("/login", login);
+router.post("/logout", logout);
+router.get("/admin", requirePageRole("admin"), adminDashboardPage);
 
 router.get("/bookings-admin", bookingsAdminPage);
 router.get("/trips/booking/:scheduleId", bookingPage);
