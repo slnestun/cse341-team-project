@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { requirePageLogin, requirePageRole } from "../middleware/auth.js";
 import { homePage, aboutPage, testErrorPage } from "./index.js";
 import { trainsPage } from "./trains.js";
 import { listTripsPage, tripDetailsPage } from "../controllers/trips.js";
@@ -16,7 +17,7 @@ import {
 	register,
 	registerPage,
 } from "../controllers/auth.js";
-import { requirePageRole } from "../middleware/auth.js";
+
 
 const router = Router();
 
@@ -34,7 +35,8 @@ router.post("/login", login);
 router.post("/logout", logout);
 router.get("/admin", requirePageRole("admin"), adminDashboardPage);
 
-router.get("/bookings-admin", bookingsAdminPage);
+
+router.get("/bookings-admin", requirePageLogin, bookingsAdminPage);
 router.get("/trips/booking/:scheduleId", bookingPage);
 router.post("/trips/book", processBookingRequest);
 router.get("/trips/confirmation/:confirmationId", confirmationPage);

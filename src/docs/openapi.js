@@ -76,6 +76,176 @@ const openApiSpec = {
 				},
 			},
 		},
+		"/api/bookings/{id}": {
+			parameters: [
+				{
+					name: "id",
+					in: "path",
+					required: true,
+					description: "Booking confirmation code.",
+					schema: {
+						type: "string",
+					},
+					example: "JRDC07XW6Y",
+				},
+			],
+			put: {
+				tags: ["Bookings"],
+				summary: "Update a booking",
+				description:
+					"Updates editable fields (`ticketClass`, `selectedDay`, `passengers`) of a booking. Admins can update any booking; customers can only update bookings that include their email in `passengers`.",
+				requestBody: {
+					required: true,
+					content: {
+						"application/json": {
+							schema: {
+								type: "object",
+								properties: {
+									ticketClass: {
+										type: "string",
+									},
+									selectedDay: {
+										type: "string",
+									},
+									passengers: {
+										type: "array",
+										minItems: 1,
+										items: {
+											type: "object",
+											required: ["firstName", "lastName", "email", "phone"],
+											properties: {
+												firstName: { type: "string" },
+												lastName: { type: "string" },
+												email: { type: "string", format: "email" },
+												phone: { type: "string" },
+											},
+										},
+									},
+								},
+							},
+							example: {
+								ticketClass: "first-class",
+								selectedDay: "2026-12-10",
+							},
+						},
+					},
+				},
+				responses: {
+					200: {
+						description: "Booking updated successfully.",
+						content: {
+							"application/json": {
+								schema: {
+									type: "object",
+									properties: {
+										booking: {
+											$ref: "#/components/schemas/Booking",
+										},
+									},
+								},
+							},
+						},
+					},
+					400: {
+						description: "Invalid update payload or missing editable fields.",
+						content: {
+							"application/json": {
+								example: {
+									error:
+										"Provide at least one field to update (ticketClass, selectedDay, or passengers).",
+								},
+							},
+						},
+					},
+					403: {
+						description: "User does not have permission to update this booking.",
+						content: {
+							"application/json": {
+								example: {
+									error: "You do not have permission to update this booking.",
+								},
+							},
+						},
+					},
+					404: {
+						description: "Booking not found.",
+						content: {
+							"application/json": {
+								example: {
+									error: "Booking not found.",
+								},
+							},
+						},
+					},
+					500: {
+						description: "Unable to update booking.",
+						content: {
+							"application/json": {
+								example: {
+									error: "Unable to update booking.",
+								},
+							},
+						},
+					},
+				},
+			},
+			delete: {
+				tags: ["Bookings"],
+				summary: "Delete a booking",
+				description:
+					"Deletes a booking by confirmation code. Admins can delete any booking; customers can only delete bookings that include their email in `passengers`.",
+				responses: {
+					200: {
+						description: "Booking deleted successfully.",
+						content: {
+							"application/json": {
+								schema: {
+									type: "object",
+									properties: {
+										message: { type: "string" },
+										id: { type: "string" },
+									},
+								},
+								example: {
+									message: "Booking deleted successfully.",
+									id: "JRDC07XW6Y",
+								},
+							},
+						},
+					},
+					403: {
+						description: "User does not have permission to delete this booking.",
+						content: {
+							"application/json": {
+								example: {
+									error: "You do not have permission to delete this booking.",
+								},
+							},
+						},
+					},
+					404: {
+						description: "Booking not found.",
+						content: {
+							"application/json": {
+								example: {
+									error: "Booking not found.",
+								},
+							},
+						},
+					},
+					500: {
+						description: "Unable to delete booking.",
+						content: {
+							"application/json": {
+								example: {
+									error: "Unable to delete booking.",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 		"/api/trips": {
 			get: {
 				tags: ["Trips"],

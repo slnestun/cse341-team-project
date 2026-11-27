@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { getAllBookings } from "../controllers/bookings.js";
+import { requireApiLogin } from "../middleware/auth.js";
+import { 
+        getAllBookings, 
+        updateBooking,
+        deleteBooking, } 
+from "../controllers/bookings.js";
 import { getSchedulesForTripAndMonth } from "../controllers/schedules.js";
 import {
 	getAllTrips,
@@ -28,7 +33,9 @@ router.get("/api/trains/:id", getTrainById);
 
 router.get("/api/trips/:id/schedules", getSchedulesForTripAndMonth);
 
-router.get("/api/bookings", getAllBookings);
+router.get("/api/bookings", requireApiLogin, getAllBookings);
+router.put("/api/bookings/:id", requireApiLogin, updateBooking);
+router.delete("/api/bookings/:id", requireApiLogin, deleteBooking);
 
 router.get("/api/ticket-classes", (req, res) => {
 	if (Object.hasOwn(req.query, "day")) {
