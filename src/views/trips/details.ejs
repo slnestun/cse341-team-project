@@ -211,14 +211,32 @@
 
                     const station = await response.json();
                     const facilitiesList = Array.isArray(station.facilities) && station.facilities.length > 0
-                        ? station.facilities.map((f) => f.replace(/_/g, ' ')).join(', ')
+                        ? station.facilities.map((f) => String(f).replace(/_/g, ' ')).join(', ')
                         : 'None listed';
 
-                    detailsBox.innerHTML = `
-                        <p><strong>${station.name}</strong> (${station.prefecture}, ${station.region})</p>
-                        <p>${station.description || ''}</p>
-                        <p><strong>Facilities:</strong> ${facilitiesList}</p>
-                    `;
+                    //title
+                    const titleP = document.createElement('p');
+                    const nameStrong = document.createElement('strong');
+                    nameStrong.textContent = station.name;
+                    titleP.append(
+                        nameStrong,
+                        document.createTextNode(` (${station.prefecture}, ${station.region})`)
+                    );
+
+                    //description
+                    const descP = document.createElement('p');
+                    descP.textContent = station.description || '';
+
+                    //facilities
+                    const facilitiesP = document.createElement('p');
+                    const facilitiesStrong = document.createElement('strong');
+                    facilitiesStrong.textContent = 'Facilities:';
+                    facilitiesP.append(
+                        facilitiesStrong,
+                        document.createTextNode(` ${facilitiesList}`)
+                    );
+
+                    detailsBox.replaceChildren(titleP, descP, facilitiesP);
                     detailsBox.dataset.loaded = 'true';
                 } catch (error) {
                     console.error('Error loading station details:', error);
