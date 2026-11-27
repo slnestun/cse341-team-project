@@ -3,7 +3,7 @@ import { getDb } from "../db/connect.js";
 import { generateConfirmationCode } from "../includes/helpers.js";
 import {
 	getAllBookings as findAllBookings,
-	getBookingsByPassengerEmail,
+	getBookingByPassengerEmail,
 	createBooking,
 	getBookingById,
 	updateBookingById,
@@ -33,7 +33,7 @@ export async function getAllBookings(req, res) {
 	try {
 		const bookings = isAdmin(req.user)
 			? await findAllBookings()
-			: await getBookingsByPassengerEmail(req.user?.email);
+			: await getBookingByPassengerEmail(req.user?.email);
 
 		return res.status(200).json({ bookings });
 	} 
