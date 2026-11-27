@@ -1,4 +1,4 @@
-//src/controllers/bookins.js
+//src/controllers/bookings.js
 import { getDb } from "../db/connect.js";
 import { generateConfirmationCode } from "../includes/helpers.js";
 import {
