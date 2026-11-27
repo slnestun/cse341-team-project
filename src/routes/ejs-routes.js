@@ -10,6 +10,12 @@ import {
     tripDetailsPage
 } from '../controllers/trips.js';
 import {
+    bookingsAdminPage,
+    bookingPage,
+    processBookingRequest,
+    confirmationPage
+} from '../controllers/bookings.js';
+import {
     adminDashboardPage,
     login,
     loginPage,
@@ -39,6 +45,12 @@ router.post('/login', login);
 router.post('/logout', logout);
 router.get('/dashboard', requirePageLogin, userDashboardPage);
 router.get('/admin', requirePageRole('admin'), adminDashboardPage);
+
+// Booking routes
+router.get('/bookings-admin', bookingsAdminPage);
+router.get('/trips/booking/:scheduleId', bookingPage);
+router.post('/trips/book', processBookingRequest);
+router.get('/trips/confirmation/:confirmationId', confirmationPage);
 
 // Error testing route
 router.get('/500', testErrorPage);
