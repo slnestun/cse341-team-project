@@ -1,0 +1,89 @@
+<%- include('../partials/header') %>
+
+    <section class="user-dashboard" data-user-email="<%= user.email %>">
+        <h1>Welcome, <%= user.displayName %>!</h1>
+
+        <nav aria-label="Dashboard links">
+            <ul>
+                <li><a href="/trips">Browse Trips</a></li>
+                <% if (user.role==='admin' ) { %>
+                    <li><a href="/bookings-admin">Booking Admin</a></li>
+                    <li><a href="/users-admin">User Admin</a></li>
+                    <% } %>
+            </ul>
+        </nav>
+
+        <section aria-labelledby="user-bookings-heading">
+            <h2 id="user-bookings-heading">Your Bookings</h2>
+            <p id="bookings-status" role="status">Loading your bookings…</p>
+            <div id="user-bookings-list"></div>
+        </section>
+    </section>
+
+    <template id="user-booking-template">
+        <article>
+            <h3 class="booking-id"></h3>
+            <p class="booking-trip"></p>
+            <p class="booking-day"></p>
+            <p class="booking-passengers"></p>
+        </article>
+    </template>
+
+    <script>
+        const loadUserBookings = async () => {
+            const container = document.querySelector(".user-dashboard");
+            const status = document.querySelector("#bookings-status");
+            const list = document.querySelector("#user-bookings-list");
+            const template = document.querySelector("#user-booking-template");
+            const userEmail = (container?.dataset.userEmail || "").trim().toLowerCase();
+
+            try {
+                const response = await fetch("/api/bookings");
+
+                if (response.status === 404) {
+                    status.textContent = "Bookings are not available yet.";
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error("Unable to load bookings.");
+                }
+
+                const { bookings = [] } = await response.json();
+
+                const matchingBookings = bookings.filter((booking) => {
+                    const passengers = Array.isArray(booking.passengers) ? booking.passengers : [];
+                    return passengers.some(
+                        (passenger) => (passenger?.email || "").trim().toLowerCase() === userEmail
+                    );
+                });
+
+                const fragment = document.createDocumentFragment();
+
+                matchingBookings.forEach((booking) => {
+                    const card = template.content.cloneNode(true);
+
+                    card.querySelector(".booking-id").textContent = booking.id;
+                    card.querySelector(".booking-trip").textContent = `Trip: ${booking.tripId}`;
+                    card.querySelector(".booking-day").textContent = `Day: ${booking.selectedDay}`;
+                    card.querySelector(".booking-passengers").textContent =
+                        `Passengers: ${booking.passengers.length}`;
+
+                    fragment.append(card);
+                });
+
+                list.replaceChildren(fragment);
+                status.textContent =
+                    matchingBookings.length === 0
+                        ? "No bookings match your email address."
+                        : `${matchingBookings.length} booking(s) found.`;
+            } catch (error) {
+                console.error(error);
+                status.textContent = "Couldn’t load bookings. Please try again.";
+            }
+        };
+
+        loadUserBookings();
+    </script>
+
+    <%- include('../partials/footer') %>
