@@ -2,16 +2,20 @@ import { Router } from "express";
 import { getAllBookings } from "../controllers/bookings.js";
 import { getSchedulesForTripAndMonth } from "../controllers/schedules.js";
 import {
-  getAllTrips,
-  getTripById,
+	getAllTrips,
+	getTripById,
 } from "../controllers/trips.js";
 import {
-  getAllTrains,
-  getTrainById,
+	getAllTrains,
+	getTrainById,
 } from "../controllers/trains.js";
 import {
-  getAllTicketClasses,
-  getTicketClassesForDay,
+	getAllStations,
+	getStationById,
+} from "../controllers/stations.js";
+import {
+	getAllTicketClasses,
+	getTicketClassesForDay,
 } from "../controllers/ticket-classes.js";
 
 const router = Router();
@@ -27,11 +31,15 @@ router.get("/api/trips/:id/schedules", getSchedulesForTripAndMonth);
 router.get("/api/bookings", getAllBookings);
 
 router.get("/api/ticket-classes", (req, res) => {
-  if (Object.hasOwn(req.query, "day")) {
-    return getTicketClassesForDay(req, res);
-  }
+	if (Object.hasOwn(req.query, "day")) {
+		return getTicketClassesForDay(req, res);
+	}
 
-  return getAllTicketClasses(req, res);
+	return getAllTicketClasses(req, res);
 });
+
+// Stations API
+router.get("/api/stations", getAllStations);
+router.get("/api/stations/:id", getStationById);
 
 export default router;
