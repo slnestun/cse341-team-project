@@ -12,51 +12,170 @@
 		<p class="booking-trip"></p>
 		<p class="booking-day"></p>
 		<p class="booking-passengers"></p>
+		<div class="booking-actions">
+			<button type="button" class="btn-edit">Edit</button>
+			<button type="button" class="btn-delete">Delete</button>
+		</div>
+		<form class="edit-form" hidden>
+			<label>
+				Ticket Class:
+				<input type="text" name="ticketClass" required />
+			</label>
+			<label>
+				Selected Day:
+				<input type="text" name="selectedDay" required />
+			</label>
+			<button type="submit">Save</button>
+			<button type="button" class="btn-cancel">Cancel</button>
+		</form>
 	</article>
 </template>
 
 <script>
-	const loadBookings = async () => {
-		const status = document.querySelector("#bookings-status");
-		const list = document.querySelector("#bookings-list");
-		const template = document.querySelector("#booking-template");
+const status = document.querySelector("#bookings-status");
+const list = document.querySelector("#bookings-list");
+const template = document.querySelector("#booking-template");
 
-		try {
-			const response = await fetch("/api/bookings");
+// API helper function
+const request = async (url, options = {}) => {
+  const response = await fetch(url, options);
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Request failed.");
+  return data;
+};
 
-			if (!response.ok) {
-				throw new Error("Unable to load bookings.");
-			}
+const api = {
+  getAll: () => request("/api/bookings"),
+  update: (id, payload) =>
+    request(`/api/bookings/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }),
+  remove: (id) => request(`/api/bookings/${id}`, { method: "DELETE" }),
+};
 
-			const { bookings } = await response.json();
-			const fragment = document.createDocumentFragment();
+// UI helpers
+const setStatus = (message) => {
+  status.textContent = message;
+};
 
-			bookings.forEach((booking) => {
-				const card = template.content.cloneNode(true);
+const updateCountStatus = () => {
+  const count = list.querySelectorAll(".booking-card").length;
+  setStatus(count === 0 ? "No bookings yet." : `${count} bookings loaded.`);
+};
 
-				card.querySelector(".booking-id").textContent = booking.id;
-				card.querySelector(".booking-trip").textContent =
-					`Trip: ${booking.tripId}`;
-				card.querySelector(".booking-day").textContent =
-					`Day: ${booking.selectedDay}`;
-				card.querySelector(".booking-passengers").textContent =
-					`Passengers: ${booking.passengers.length}`;
+const handleError = (error, fallback = "Something went wrong.") => {
+  console.error(error);
+  setStatus(error.message || fallback);
+};
 
-				fragment.append(card);
-			});
+// Element getters for booking card
+const getCardElements = (card) => ({
+  id: card.querySelector(".booking-id"),
+  trip: card.querySelector(".booking-trip"),
+  ticketClass: card.querySelector(".booking-class"),
+  day: card.querySelector(".booking-day"),
+  passengers: card.querySelector(".booking-passengers"),
+  editBtn: card.querySelector(".btn-edit"),
+  deleteBtn: card.querySelector(".btn-delete"),
+  cancelBtn: card.querySelector(".btn-cancel"),
+  form: card.querySelector(".edit-form"),
+});
 
-			list.replaceChildren(fragment);
-			status.textContent =
-				bookings.length === 0
-					? "No bookings yet."
-					: `${bookings.length} bookings loaded.`;
-		} catch (error) {
-			console.error(error);
-			status.textContent = "Couldn’t load bookings. Please try again.";
-		}
-	};
+const paintStatic = (els, booking) => {
+  els.id.textContent = booking.id;
+  els.trip.textContent = `Trip: ${booking.tripId}`;
+  els.passengers.textContent = `Passengers: ${booking.passengers.length}`;
+};
 
-	loadBookings();
+const paintEditable = (els, booking) => {
+  els.ticketClass.textContent = `Class: ${booking.ticketClass}`;
+  els.day.textContent = `Day: ${booking.selectedDay}`;
+};
+
+const resetForm = (els, booking) => {
+  els.form.elements.ticketClass.value = booking.ticketClass;
+  els.form.elements.selectedDay.value = booking.selectedDay;
+};
+
+// editing setup
+const setupEdit = (els, booking) => {
+  els.editBtn.addEventListener("click", () => {
+    els.form.hidden = !els.form.hidden;
+  });
+
+  els.cancelBtn.addEventListener("click", () => {
+    resetForm(els, booking);
+    els.form.hidden = true;
+  });
+
+  els.form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const payload = {
+      ticketClass: els.form.elements.ticketClass.value.trim(),
+      selectedDay: els.form.elements.selectedDay.value.trim(),
+    };
+
+    try {
+      const { booking: updated } = await api.update(booking.id, payload);
+      Object.assign(booking, {
+        ticketClass: updated.ticketClass,
+        selectedDay: updated.selectedDay,
+      });
+      paintEditable(els, booking);
+      els.form.hidden = true;
+      setStatus(`Booking ${booking.id} updated.`);
+    } catch (error) {
+      handleError(error, "Unable to update booking.");
+    }
+  });
+};
+
+// deletion setup
+const setupDelete = (card, els, booking) => {
+  els.deleteBtn.addEventListener("click", async () => {
+    if (!window.confirm(`Are you sure you want to delete booking ${booking.id}?`)) return;
+
+    try {
+      await api.remove(booking.id);
+      card.remove();
+      updateCountStatus();
+    } catch (error) {
+      handleError(error, "Unable to delete booking.");
+    }
+  });
+};
+
+// assign booking data to card elements and set up event listeners
+const renderBookingCard = (booking) => {
+  const card = template.content.cloneNode(true).querySelector(".booking-card");
+  const els = getCardElements(card);
+
+  paintStatic(els, booking);
+  paintEditable(els, booking);
+  resetForm(els, booking);
+
+  setupEdit(els, booking);
+  setupDelete(card, els, booking);
+
+  return card;
+};
+
+// load bookings from API and render them
+const loadBookings = async () => {
+  try {
+    const { bookings } = await api.getAll();
+    list.replaceChildren(...bookings.map(renderBookingCard));
+    updateCountStatus();
+  } catch (error) {
+    console.error(error);
+    setStatus("Couldn’t load bookings. Please try again.");
+  }
+};
+
+loadBookings();
 </script>
 
 <%- include('partials/footer') %>

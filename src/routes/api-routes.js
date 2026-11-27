@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { requireApiLogin } from "../middleware/auth.js";
 import { 
         getAllBookings, 
         updateBooking,
