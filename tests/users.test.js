@@ -172,6 +172,43 @@ describe('User account permissions', () => {
         expect(updatedCustomer.passwordHash).toBe(originalPasswordHash);
     });
 
+    test('rejects unauthorized fields even when valid fields are included', async () => {
+        const response = await customerAgent
+            .put(`/api/users/${customer._id}`)
+            .send({
+                displayName: 'Updated Customer',
+                role: 'admin'
+            });
+
+        expect(response.status).toBe(400);
+
+        const updatedCustomer = await User.findById(customer._id)
+            .populate('role');
+
+        expect(updatedCustomer.displayName).toBe('Test Customer');
+        expect(updatedCustomer.role.name).toBe('customer');
+    });
+
+    test('rejects invalid email addresses', async () => {
+        const response = await customerAgent
+            .put(`/api/users/${customer._id}`)
+            .send({ email: 'not-an-email' });
+
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe(
+            'Please provide a valid email address'
+        );
+    });
+
+    test('allows customers to update their email with a valid address', async () => {
+        const response = await customerAgent
+            .put(`/api/users/${customer._id}`)
+            .send({ email: 'updated@example.com' });
+
+        expect(response.status).toBe(200);
+        expect(response.body.user.email).toBe('updated@example.com');
+    });
+
     test('allows admins to update another account', async () => {
         const response = await adminAgent
             .put(`/api/users/${customer._id}`)

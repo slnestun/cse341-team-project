@@ -101,6 +101,17 @@ export async function updateUser(req, res) {
         const allowedFields = ['displayName', 'username', 'email'];
         const updates = {};
 
+        // Reject fields that users are not allowed to update.
+        const unexpectedFields = Object.keys(body).filter(
+            (field) => !allowedFields.includes(field)
+        );
+
+        if (unexpectedFields.length > 0) {
+            return res.status(400).json({
+                error: `Fields cannot be updated: ${unexpectedFields.join(', ')}`
+            });
+        }
+
         for (const field of allowedFields) {
             if (Object.hasOwn(body, field)) {
                 if (
@@ -122,20 +133,29 @@ export async function updateUser(req, res) {
             });
         }
 
+        // Validate email format.
+        if (updates.email) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailPattern.test(updates.email)) {
+                return res.status(400).json({
+                    error: 'Please provide a valid email address'
+                });
+            }
+
+            updates.email = updates.email.toLowerCase();
+        }
+
+        if (updates.username) {
+            updates.username = updates.username.toLowerCase();
+        }
+
         const existingUser = await findUserById(id);
 
         if (!existingUser) {
             return res.status(404).json({
                 error: 'User not found'
             });
-        }
-
-        if (updates.email) {
-            updates.email = updates.email.toLowerCase();
-        }
-
-        if (updates.username) {
-            updates.username = updates.username.toLowerCase();
         }
 
         const updatedUser = await updateUserRecord(id, updates);
