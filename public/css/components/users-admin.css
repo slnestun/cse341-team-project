@@ -1,0 +1,129 @@
+.users-admin {
+    padding-block: var(--space-xl);
+}
+
+.users-admin h1 {
+    margin-bottom: var(--space-xs);
+    color: var(--clr-text-primary);
+}
+
+.users-admin > p {
+    margin-bottom: var(--space-lg);
+    color: var(--clr-text-secondary);
+}
+
+#users-message {
+    margin-bottom: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+}
+
+#users-message:empty {
+    display: none;
+}
+
+#users-message.success {
+    background: var(--clr-primary-pale);
+    color: var(--clr-text-primary);
+}
+
+#users-message.error {
+    background: #fcebea;
+    color: #8a2c2c;
+}
+
+#users-loading {
+    color: var(--clr-text-secondary);
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.users-table th,
+.users-table td {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--clr-border-light);
+    text-align: left;
+}
+
+.users-table th {
+    background: var(--clr-surface-alt);
+    color: var(--clr-text-primary);
+    font-weight: 600;
+}
+
+.users-table td {
+    color: var(--clr-text-secondary);
+}
+
+.users-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.users-table tbody tr:hover {
+    background: var(--clr-background);
+}
+
+.users-table button {
+    margin-right: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border: 1px solid var(--clr-primary);
+    border-radius: var(--radius-sm);
+    background: var(--clr-surface);
+    color: var(--clr-text-primary);
+    cursor: pointer;
+}
+
+.users-table button:hover {
+    background: var(--clr-primary-pale);
+}
+
+.admin-actions {
+    margin-top: var(--space-xl);
+    padding: var(--space-lg);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-md);
+    background: var(--clr-surface);
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-actions h2 {
+    margin-bottom: var(--space-xs);
+}
+
+.admin-actions p {
+    margin-bottom: var(--space-md);
+    color: var(--clr-text-secondary);
+}
+
+.admin-actions a {
+    display: inline-block;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    background: var(--clr-primary);
+    color: white;
+    text-decoration: none;
+}
+
+.admin-actions a:hover {
+    background: var(--clr-text-secondary);
+}
+
+@media (max-width: 700px) {
+    .users-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .users-table th,
+    .users-table td {
+        padding: var(--space-sm);
+    }
+}

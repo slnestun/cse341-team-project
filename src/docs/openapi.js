@@ -1,3 +1,4 @@
+
 const openApiSpec = {
 	openapi: "3.0.3",
 	info: {
@@ -37,8 +38,158 @@ const openApiSpec = {
 			name: "Ticket Classes",
 			description: "Ticket class availability and pricing information",
 		},
+		{
+			name: "Users",
+			description: "User account management",
+		},
 	],
 	paths: {
+		"/api/users": {
+			get: {
+				tags: ["Users"],
+				summary: "Get user accounts",
+				description:
+					"Admins can view all user accounts. Customers can only view their own account. Requires authentication.",
+				responses: {
+					200: {
+						description: "User accounts retrieved successfully.",
+						content: {
+							"application/json": {
+								schema: {
+									type: "object",
+									properties: {
+										users: {
+											type: "array",
+											items: {
+												$ref: "#/components/schemas/UserProfile",
+											},
+										},
+										currentUser: {
+											type: "object",
+											properties: {
+												id: { type: "string" },
+												role: {
+													type: "string",
+													enum: ["admin", "customer"],
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					401: {
+						description: "Authentication required.",
+					},
+					500: {
+						description: "Failed to fetch users.",
+					},
+				},
+			},
+		},
+		"/api/users/{id}": {
+			get: {
+				tags: ["Users"],
+				summary: "Get a user by ID",
+				description:
+					"Admins can view any account. Customers can only view their own account.",
+				parameters: [
+					{
+						name: "id",
+						in: "path",
+						required: true,
+						schema: { type: "string" },
+					},
+				],
+				responses: {
+					200: {
+						description: "User retrieved successfully.",
+						content: {
+							"application/json": {
+								schema: {
+									$ref: "#/components/schemas/UserProfile",
+								},
+							},
+						},
+					},
+					400: { description: "Invalid user ID." },
+					401: { description: "Authentication required." },
+					403: { description: "Forbidden." },
+					404: { description: "User not found." },
+					500: { description: "Failed to fetch user." },
+				},
+			},
+			put: {
+				tags: ["Users"],
+				summary: "Update a user account",
+				description:
+					"Users can update their own account. Admins can update any account. Role and password hash cannot be changed through this endpoint.",
+				parameters: [
+					{
+						name: "id",
+						in: "path",
+						required: true,
+						schema: { type: "string" },
+					},
+				],
+				requestBody: {
+					required: true,
+					content: {
+						"application/json": {
+							schema: {
+								type: "object",
+								properties: {
+									displayName: { type: "string" },
+									username: { type: "string" },
+									email: {
+										type: "string",
+										format: "email",
+									},
+								},
+							},
+						},
+					},
+				},
+				responses: {
+					200: {
+						description: "User updated successfully.",
+					},
+					400: { description: "Invalid update data." },
+					401: { description: "Authentication required." },
+					403: { description: "Forbidden." },
+					404: { description: "User not found." },
+					409: {
+						description: "Username or email already exists.",
+					},
+					500: { description: "Failed to update user." },
+				},
+			},
+			delete: {
+				tags: ["Users"],
+				summary: "Delete a user account",
+				description:
+					"Users can delete their own account. Admins can delete any account. Deleting your own account ends your session.",
+				parameters: [
+					{
+						name: "id",
+						in: "path",
+						required: true,
+						schema: { type: "string" },
+					},
+				],
+				responses: {
+					200: {
+						description: "User account deleted successfully.",
+					},
+					400: { description: "Invalid user ID." },
+					401: { description: "Authentication required." },
+					403: { description: "Forbidden." },
+					404: { description: "User not found." },
+					500: { description: "Failed to delete user." },
+				},
+			},
+		},
 		"/api/bookings": {
 			get: {
 				tags: ["Bookings"],
@@ -377,6 +528,24 @@ const openApiSpec = {
 	},
 	components: {
 		schemas: {
+			UserProfile: {
+				type: "object",
+				properties: {
+					_id: { type: "string" },
+					displayName: { type: "string" },
+					username: { type: "string" },
+					email: { type: "string", format: "email" },
+					role: {
+						type: "object",
+						properties: {
+							name: {
+								type: "string",
+								enum: ["admin", "customer"],
+							},
+						},
+					},
+				},
+			},
 			Booking: {
 				type: "object",
 				properties: {
