@@ -302,3 +302,173 @@
         }
     }
 }
+
+/* Trip administration shares the public trip and booking page design tokens. */
+.trip-admin {
+    min-width: 0;
+
+    #trips-status {
+        margin-top: var(--space-lg);
+        padding: var(--space-sm) var(--space-md);
+        background: var(--clr-primary-pale-secondary);
+        border: 1px solid var(--clr-border);
+        border-radius: var(--radius-md);
+        color: var(--clr-text-secondary);
+    }
+
+    #trips-list {
+        display: grid;
+        gap: var(--space-xl);
+        margin-top: var(--space-xl);
+    }
+
+    article {
+        min-width: 0;
+        padding: var(--space-lg);
+        background: var(--clr-surface);
+        border: 1px solid var(--clr-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+    }
+
+    article > h2 {
+        margin-bottom: var(--space-xs);
+        overflow-wrap: anywhere;
+    }
+
+    article > p {
+        color: var(--clr-text-secondary);
+        padding-bottom: var(--space-lg);
+        margin-bottom: var(--space-lg);
+        border-bottom: 1px solid var(--clr-border-light);
+        overflow-wrap: anywhere;
+    }
+
+    form {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-lg);
+    }
+
+    form > label {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+        min-width: 0;
+        margin: 0;
+    }
+
+    input[type="text"], textarea, select {
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+        box-sizing: border-box;
+        padding: var(--space-sm);
+        border-radius: var(--radius-md);
+    }
+
+    textarea {
+        min-height: 12rem;
+    }
+
+    fieldset {
+        display: grid;
+        gap: var(--space-xs);
+        min-width: 0;
+        margin: 0;
+        padding: var(--space-md);
+        background: var(--clr-surface-alt);
+        border: 1px solid var(--clr-border);
+        border-radius: var(--radius-md);
+    }
+
+    legend {
+        padding-inline: var(--space-xs);
+        color: var(--clr-text-primary);
+        font-weight: 700;
+    }
+
+    fieldset label {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-sm);
+        margin: 0;
+        padding: var(--space-sm);
+        background: var(--clr-surface);
+        border: 1px solid var(--clr-border-light);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        overflow-wrap: anywhere;
+    }
+
+    input[type="checkbox"] {
+        flex-shrink: 0;
+        width: 1.8rem;
+        height: 1.8rem;
+        margin-top: .5rem;
+        accent-color: var(--clr-text-primary);
+    }
+
+    .trip-admin-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        padding-top: var(--space-md);
+        border-top: 1px solid var(--clr-border-light);
+    }
+
+    button {
+        flex: 1 1 18rem;
+        min-height: 4.4rem;
+        border-radius: var(--radius-md);
+        font-weight: 700;
+    }
+
+    button[type="submit"]:not(:disabled) {
+        color: var(--clr-text-primary);
+    }
+
+    button[type="button"]:not(:disabled) {
+        color: var(--clr-autumn-text);
+        background: var(--clr-autumn);
+        border: 1px solid var(--clr-autumn-text);
+    }
+
+    button[type="button"]:hover:not(:disabled) {
+        background: var(--clr-accent-warm);
+    }
+
+    button:focus-visible, input[type="checkbox"]:focus-visible {
+        outline: 2px solid var(--clr-text-primary);
+        outline-offset: 3px;
+    }
+
+    form > p {
+        margin: 0;
+        color: var(--clr-text-primary);
+        overflow-wrap: anywhere;
+    }
+
+    form > p:empty {
+        display: none;
+    }
+
+    @media (min-width: 768px) {
+        article {
+            padding: var(--space-xl);
+        }
+
+        form {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .trip-admin-wide, fieldset, .trip-admin-actions, form > p {
+            grid-column: 1 / -1;
+        }
+
+        button {
+            flex: 0 1 auto;
+            min-width: 16rem;
+        }
+    }
+}

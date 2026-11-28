@@ -1,0 +1,252 @@
+<%- include('../partials/header') %>
+
+<section class="trip-admin">
+	<h1>Trips Admin</h1>
+	<p><a href="/admin">Back to Admin Dashboard</a></p>
+
+	<p id="trips-status" role="status">Loading trips…</p>
+	<div id="trips-list"></div>
+</section>
+<script>
+	const loadTrips = async () => {
+		const status = document.querySelector("#trips-status");
+		const list = document.querySelector("#trips-list");
+
+		try {
+			const [tripsResponse, stationsResponse] = await Promise.all([
+				fetch("/api/trips"),
+				fetch("/api/stations"),
+			]);
+
+			if (!tripsResponse.ok || !stationsResponse.ok) {
+				throw new Error("Unable to load trips or stations.");
+			}
+
+			const { trips } = await tripsResponse.json();
+			const stationsData = await stationsResponse.json();
+			const stations = Array.isArray(stationsData)
+				? stationsData
+				: stationsData.stations;
+			const scheduleEntries = await Promise.all(
+				trips.map(async (trip) => {
+					const response = await fetch(
+						`/api/admin/trips/${encodeURIComponent(trip.id)}/schedules`,
+					);
+
+					if (!response.ok) {
+						throw new Error("Unable to load schedule options.");
+					}
+
+					const { schedules } = await response.json();
+					return [trip.id, schedules];
+				}),
+			);
+
+			const schedulesByTrip = new Map(scheduleEntries);
+			const fragment = document.createDocumentFragment();
+
+			trips.forEach((trip) => {
+				const article = document.createElement("article");
+				const heading = document.createElement("h2");
+				const route = document.createElement("p");
+
+				heading.textContent = trip.name;
+				route.textContent = `${trip.startStation} → ${trip.endStation}`;
+
+				const form = document.createElement("form");
+
+				const nameLabel = document.createElement("label");
+				nameLabel.className = "trip-admin-wide";
+				nameLabel.textContent = "Name ";
+
+				const nameInput = document.createElement("input");
+				nameInput.type = "text";
+				nameInput.value = trip.name;
+				nameInput.required = true;
+				nameLabel.append(nameInput);
+
+				const descriptionLabel = document.createElement("label");
+				descriptionLabel.className = "trip-admin-wide";
+				descriptionLabel.textContent = "Description ";
+
+				const descriptionInput = document.createElement("textarea");
+				descriptionInput.value = trip.description;
+				descriptionInput.required = true;
+				descriptionLabel.append(descriptionInput);
+
+				const saveButton = document.createElement("button");
+				saveButton.type = "submit";
+				saveButton.textContent = "Save changes";
+
+				const actions = document.createElement("div");
+				actions.className = "trip-admin-actions";
+				actions.append(saveButton);
+
+				const message = document.createElement("p");
+				message.setAttribute("role", "status");
+
+				const startLabel = document.createElement("label");
+				startLabel.textContent = "Start station ";
+
+				const endLabel = document.createElement("label");
+				endLabel.textContent = "End station ";
+
+				const startSelect = document.createElement("select");
+				const endSelect = document.createElement("select");
+
+				startSelect.required = true;
+				endSelect.required = true;
+
+				stations.forEach((station) => {
+					const startOption = document.createElement("option");
+					startOption.value = station.id;
+					startOption.textContent = station.name;
+					startOption.selected = station.id === trip.startStation;
+
+					const endOption = document.createElement("option");
+					endOption.value = station.id;
+					endOption.textContent = station.name;
+					endOption.selected = station.id === trip.endStation;
+
+					startSelect.append(startOption);
+					endSelect.append(endOption);
+				});
+
+				startLabel.append(startSelect);
+				endLabel.append(endSelect);
+				const scheduleFieldset = document.createElement("fieldset");
+				const scheduleLegend = document.createElement("legend");
+				scheduleLegend.textContent = "Enabled schedules";
+				scheduleFieldset.append(scheduleLegend);
+
+				const scheduleInputs = [];
+
+				(schedulesByTrip.get(trip.id) || []).forEach((schedule) => {
+					const label = document.createElement("label");
+					const checkbox = document.createElement("input");
+
+					checkbox.type = "checkbox";
+					checkbox.value = schedule.id;
+					checkbox.checked = Array.isArray(trip.activeScheduleIds)
+						? trip.activeScheduleIds.includes(schedule.id)
+						: true;
+
+					label.append(
+						checkbox,
+						document.createTextNode(
+							` ${schedule.departureTime} → ${schedule.arrivalTime}` +
+								` (${(schedule.daysOfWeek || []).join(", ")})`,
+						),
+					);
+
+					scheduleInputs.push(checkbox);
+					scheduleFieldset.append(label);
+				});
+
+				if (scheduleInputs.length === 0) {
+					const notice = document.createElement("p");
+					notice.textContent = "This trip has no existing schedules.";
+					scheduleFieldset.append(notice);
+				}
+				form.append(
+					nameLabel,
+					descriptionLabel,
+					startLabel,
+					endLabel,
+					scheduleFieldset,
+					actions,
+					message,
+				);
+
+				form.addEventListener("submit", async (event) => {
+					event.preventDefault();
+					saveButton.disabled = true;
+					message.textContent = "Saving…";
+
+					try {
+						const response = await fetch(
+							`/api/trips/${encodeURIComponent(trip.id)}`,
+							{
+								method: "PUT",
+								headers: { "Content-Type": "application/json" },
+								body: JSON.stringify({
+									name: nameInput.value,
+									description: descriptionInput.value,
+									startStation: startSelect.value,
+									endStation: endSelect.value,
+									activeScheduleIds: scheduleInputs
+										.filter((checkbox) => checkbox.checked)
+										.map((checkbox) => Number(checkbox.value)),
+								}),
+							},
+						);
+
+						const result = await response.json();
+
+						if (!response.ok) {
+							throw new Error(result.message || "Unable to update trip.");
+						}
+
+						await loadTrips();
+						status.textContent = "Trip updated successfully.";
+					} catch (error) {
+						message.textContent = error.message;
+					} finally {
+						saveButton.disabled = false;
+					}
+				});
+				const deleteButton = document.createElement("button");
+				deleteButton.type = "button";
+				deleteButton.textContent = "Delete trip";
+
+				deleteButton.addEventListener("click", async () => {
+					if (
+						!window.confirm(`Delete "${trip.name}"? This cannot be undone.`)
+					) {
+						return;
+					}
+
+					deleteButton.disabled = true;
+					saveButton.disabled = true;
+					message.textContent = "Deleting…";
+
+					try {
+						const response = await fetch(
+							`/api/trips/${encodeURIComponent(trip.id)}`,
+							{ method: "DELETE" },
+						);
+
+						if (!response.ok) {
+							const result = await response.json();
+							throw new Error(result.message || "Unable to delete trip.");
+						}
+
+						await loadTrips();
+						status.textContent = "Trip deleted successfully.";
+					} catch (error) {
+						message.textContent = error.message;
+					} finally {
+						deleteButton.disabled = false;
+						saveButton.disabled = false;
+					}
+				});
+
+				actions.append(deleteButton);
+
+				article.append(heading, route, form);
+				fragment.append(article);
+			});
+
+			list.replaceChildren(fragment);
+			status.textContent = trips.length
+				? `${trips.length} trips loaded.`
+				: "No trips found.";
+		} catch (error) {
+			status.textContent = error.message;
+		}
+	};
+
+	loadTrips();
+</script>
+
+<%- include('../partials/footer') %>

@@ -35,6 +35,15 @@ const bookingPage = async (req, res) => {
 		throw error;
 	}
 	const trip = await db.collection("trips").findOne({ id: schedule.tripId });
+	if (
+		!trip ||
+		(Array.isArray(trip.activeScheduleIds) &&
+			!trip.activeScheduleIds.includes(schedule.id))
+	) {
+		return res.status(404).render("errors/404", {
+			title: "Trip Departure Unavailable",
+		});
+	}
 	const ticketClasses = await getAllTicketClasses();
 	const ticketOptions = ticketClasses.map((ticketClass) => ({
 		class: ticketClass.class,
@@ -45,7 +54,7 @@ const bookingPage = async (req, res) => {
 		availableDays: ticketClass.availableDays,
 	}));
 
-	res.render("trips/book", {
+	return res.render("trips/book", {
 		title: "Book Trip",
 		schedule,
 		ticketOptions,
@@ -53,10 +62,38 @@ const bookingPage = async (req, res) => {
 };
 
 const processBookingRequest = async (req, res) => {
+	const scheduleId = Number(req.body?.scheduleId);
+
+	if (!Number.isInteger(scheduleId)) {
+		return res.status(400).send("Invalid schedule.");
+	}
+
+	const db = getDb();
+	const schedule = await db.collection("schedules").findOne({
+		id: scheduleId,
+	});
+
+	const trip = schedule
+		? await db.collection("trips").findOne({ id: schedule.tripId })
+		: null;
+
+	if (
+		!trip ||
+		(Array.isArray(trip.activeScheduleIds) &&
+			!trip.activeScheduleIds.includes(schedule.id))
+	) {
+		return res
+			.status(409)
+			.send(
+				"This departure is no longer available. Please select another schedule.",
+			);
+	}
 	const bookingData = {
 		...req.body,
 		id: generateConfirmationCode(),
 		createdAt: new Date().toISOString(),
+		tripId: trip.id,
+		scheduleId: String(schedule.id),
 	};
 
 	const booking = await createBooking(bookingData);

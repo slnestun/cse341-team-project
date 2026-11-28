@@ -1,77 +1,84 @@
-
 import mongoose from "mongoose";
 
 const tripSchema = new mongoose.Schema(
-  {
-    id: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    description: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    region: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    startStation: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    endStation: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    duration: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    distance: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-    highlights: {
-      type: [String],
-      default: [],
-    },
-    bestSeason: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    operatingMonths: {
-      type: [
-        {
-          type: Number,
-          min: 1,
-          max: 12,
-        },
-      ],
-      default: [],
-    },
-    imageUrl: {
-      type: String,
-      trim: true,
-    },
-  },
-  {
-    timestamps: true,
-    collection: "trips",
-  }
+	{
+		id: {
+			type: String,
+			required: true,
+			unique: true,
+			trim: true,
+		},
+		name: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+		description: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+		region: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+		startStation: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+		endStation: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+		duration: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+		distance: {
+			type: Number,
+			required: true,
+			min: 0,
+		},
+		highlights: {
+			type: [String],
+			default: [],
+		},
+		bestSeason: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+		operatingMonths: {
+			type: [
+				{
+					type: Number,
+					min: 1,
+					max: 12,
+				},
+			],
+			default: [],
+		},
+		imageUrl: {
+			type: String,
+			trim: true,
+		},
+		activeScheduleIds: {
+			type: [Number],
+			default: undefined,
+			validate: {
+				validator: (ids) => ids === undefined || ids.every(Number.isInteger),
+				message: "Schedule IDs must be integers.",
+			},
+		},
+	},
+	{
+		timestamps: true,
+		collection: "trips",
+	},
 );
 
 const trip = mongoose.model("Trip", tripSchema);
