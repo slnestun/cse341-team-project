@@ -41,4 +41,10 @@ router.get("/trips/confirmation/:confirmationId", confirmationPage);
 
 router.get("/500", testErrorPage);
 
+router.get("/trips-admin", requirePageRole("admin"), (req, res) => {
+	return res.render("trips/admin", {
+		title: "Trips Admin",
+	});
+});
+
 export default router;
